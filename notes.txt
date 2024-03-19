@@ -1,0 +1,14 @@
+------TERMINAL COMMANDS----------
+-ls
+-cd <folder>
+-cd ..
+-clear
+-history
+-pwd
+up or down arrow to repeat previous command
+tab to autofill
+
+--------EXPLANATION-------------
+node -> Run JS
+git -> Git manager
+npm -> Install JS library
