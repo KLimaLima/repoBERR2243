@@ -12,3 +12,13 @@ tab to autofill
 node -> Run JS
 git -> Git manager
 npm -> Install JS library
+
+---------25/3/2024--------------
+
+MongoAtlas
+    |
+    Database
+      |
+      Collections
+        |
+        Documents
