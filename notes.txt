@@ -27,9 +27,9 @@ MongoAtlas
 
 C - insertOne
 R - find
-    find
+    findOne
 U - updateOne
-D
+D - deleteOne
 
 async function:
                 Promise<....>
@@ -59,7 +59,7 @@ To find and filter
     ).toArray()
     console.log(subtitle)
 
-To update document
+To update document based on properties
 
     let updated = await client.db('sample_mflix').collection('subtitle').updateOne(
       { movie: 'Your Name' },
@@ -70,7 +70,7 @@ To update document
     )
     console.log(updated)
 
-To
+To delete a document according to ObjectId
 
     let deleted = await client.db('sample_mflix').collection('subtitle').deleteOne(
       {
