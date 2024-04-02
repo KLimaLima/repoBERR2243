@@ -22,3 +22,59 @@ MongoAtlas
       Collections
         |
         Documents
+
+------------2/4/2024-------------
+
+C - insertOne
+R - find
+    find
+U - updateOne
+D
+
+async function:
+                Promise<....>
+
+To insert a new collection and document into database simultaneously:
+
+    let result = await client.db('sample_mflix').collection('subtitle').insertOne(
+      {
+        language: 'Malay',
+        movie: 'Your Name',
+        author: 'Ali'
+      }
+    )
+    console.log(result)
+
+To find all documents
+
+    let subtitle = await client.db('sample_mflix').collection('subtitle').find().toArray()
+    console.log(subtitle)
+
+To find and filter
+
+    let subtitle = await client.db('sample_mflix').collection('subtitle').find(
+      {
+         language: 'Malay'
+      }
+    ).toArray()
+    console.log(subtitle)
+
+To update document
+
+    let updated = await client.db('sample_mflix').collection('subtitle').updateOne(
+      { movie: 'Your Name' },
+      { $set:{
+        author: 'Abu'
+        }
+      }
+    )
+    console.log(updated)
+
+To
+
+    let deleted = await client.db('sample_mflix').collection('subtitle').deleteOne(
+      {
+        _id: new ObjectId('660b6d82639a5d19b19fde83')
+      }
+    )
+    console.log(deleted)

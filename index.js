@@ -5,16 +5,16 @@ const port = process.env.PORT || 3000;
 app.use(express.json())
 
 app.get('/', (req, res) => {
-   res.send('Khai was here')
+  res.send('Khai was here')
 })
 
 app.listen(port, () => {
-   console.log(`Example app listening on port ${port}`)
+  console.log(`Example app listening on port ${port}`)
 })
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = "mongodb+srv://khairul:DatabaseKhairul@clusterberr2243.2vppqvg.mongodb.net/?retryWrites=true&w=majority&appName=ClusterBERR2243";
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -32,10 +32,46 @@ async function run() {
     await client.connect();
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
+
+    // let result = await client.db('sample_mflix').collection('subtitle').insertOne(
+    //   {
+    //     language: 'Japanese',
+    //     movie: 'Tokyo Drift',
+    //     author: 'Kohei'
+    //   }
+    // )
+    // console.log(result)
+
+    // let subtitle = await client.db('sample_mflix').collection('subtitle').find().toArray()
+    // console.log(subtitle)
+
+    // let subtitle = await client.db('sample_mflix').collection('subtitle').find(
+    //   {
+    //     language: 'Malay'
+    //   }
+    // ).toArray()
+    // console.log(subtitle)
+
+    // let updated = await client.db('sample_mflix').collection('subtitle').updateOne(
+    //   { movie: 'Your Name' },
+    //   { $set:{
+    //     author: 'Abu'
+    //     }
+    //   }
+    // )
+    // console.log(updated)
+
+    // let deleted = await client.db('sample_mflix').collection('subtitle').deleteOne(
+    //   {
+    //     _id: new ObjectId('660b6d82639a5d19b19fde83')
+    //   }
+    // )
+    // console.log(deleted)
+
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
-    await client.close();
+    //await client.close();
   }
 }
 run().catch(console.dir);
