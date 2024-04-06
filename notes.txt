@@ -23,13 +23,13 @@ MongoAtlas
         |
         Documents
 
-------------2/4/2024-------------
+------------2/4/2024(1)-------------
 
-C - insertOne
-R - find
-    findOne
-U - updateOne
-D - deleteOne
+C - insertOne   | POST
+R - find        | GET
+    findOne     |
+U - updateOne   | PATCH 
+D - deleteOne   | DELETE
 
 async function:
                 Promise<....>
@@ -78,3 +78,44 @@ To delete a document according to ObjectId
       }
     )
     console.log(deleted)
+
+----------------2/4/2024(2)---------------------------------
+
+1.
+app.get('/', (req, res) => {
+  res.send('Khai was here')
+})
+
+get is the protocol method (etc. GET, POST, PATCH)
+/: endpoint (like file directory)
+req: request
+res: response
+
+2.
+app.get('/', (req, res) => {
+  res.status(200).send('Khai was here')
+})
+
+Can put status code by yourself
+
+3.
+app.get('/subtitle', async (req, res) => {
+  let subtitle = await client.db('sample_mflix').collection('subtitle').find().toArray()
+  res.send(subtitle)
+})
+
+This is how you send a response back to the website (This is a raw display)
+
+will learn:
+
+HTTP        MongoDB
+POST    C   insertOne
+GET     R   find
+PATCH   U   updateOne
+DELETE  D   deleteOne
+
+3 API and each must have CRUD
+
+3 x 12 API
+
+Deadline: W13
