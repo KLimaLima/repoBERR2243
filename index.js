@@ -1,8 +1,24 @@
 const express = require('express')
+const bcrypt = require('bcrypt')
 const app = express()
 const port = process.env.PORT || 3000;
+const saltRounds = 10
 
 app.use(express.json())
+
+app.post('/user', async (req, res) => {
+
+  const hash = bcrypt.hashSync(req.body.author, saltRounds)
+  //insertOne the registration data to mongoDB
+  let result = await client.db('sample_mflix').collection('subtitle').insertOne(
+    {
+      language: req.body.language,
+      movie: req.body.movie,
+      author: hash,
+    }
+  )
+  res.send(result)
+})
 
 app.get('/', (req, res) => {
   res.send('Khai was here')

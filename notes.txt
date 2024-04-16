@@ -110,7 +110,7 @@ will learn:
 
 HTTP        MongoDB
 POST    C   insertOne
-GET     R   find
+GET     R   find/findOne
 PATCH   U   updateOne
 DELETE  D   deleteOne
 
@@ -119,3 +119,32 @@ DELETE  D   deleteOne
 3 x 12 API
 
 Deadline: W13
+
+---------------------------16/4/2024------------------------------------------
+
+127.0.0.1 is the server for self computer
+
+app.post('/user', async (req, res) => {
+  //insertOne the registration data to mongoDB
+  console.log(req.body) //Get body
+})
+
+app.post('/user', async (req, res) => {
+  //insertOne the registration data to mongoDB
+  console.log(req.body.username) //Get data from username field in the json
+})
+
+app.post('/user', async (req, res) => {
+  //insertOne the registration data to mongoDB
+  let result = await client.db('sample_mflix').collection('subtitle').insertOne(
+    {
+      language: req.body.language,
+      movie: req.body.movie,
+      author: req.body.author,
+    }
+  )
+  res.send(result)
+})
+
+encryption and decryption -> can go back and forth
+hashing -> can only go one way
