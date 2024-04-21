@@ -6,19 +6,158 @@ const saltRounds = 10
 
 app.use(express.json())
 
-app.post('/user', async (req, res) => {
+app.post('/register', async (req, res) => {
 
-  const hash = bcrypt.hashSync(req.body.author, saltRounds)
-  //insertOne the registration data to mongoDB
-  let result = await client.db('sample_mflix').collection('subtitle').insertOne(
+  if (req.body.username != null && req.body.password != null) {
+    
+    let findSimilar = await client.db("instagram").collection("account").findOne(
+      {
+        username: req.body.username
+      }
+    )
+
+    if (!findSimilar) {
+
+      const hash = bcrypt.hashSync(req.body.password, saltRounds)
+
+      let result = await client.db("instagram").collection("account").insertOne(
+        {
+          username: req.body.username,
+          password: hash
+        }
+      )
+
+      if (result) {
+        res.send(`Successfully registered!`)
+        console.log(`Inserted into DB\nusername: ${req.body.username}\npassword: ${req.body.password}`)
+      } else {
+        res. send(`Something went wrong! Please try again.`)
+      }
+
+    } else {
+      res.send(`The username ${req.body.username} is already taken.`)    
+    }
+
+  } else {
+    res.send(`Please enter a username and password.`)
+  }
+
+})
+
+app.get(`/login`, async (req, res) => {
+
+  let result = await client.db("instagram").collection("account").findOne(
     {
-      language: req.body.language,
-      movie: req.body.movie,
-      author: hash,
+      username: req.body.username
     }
   )
-  res.send(result)
+
+  if (result) {
+    if(bcrypt.compareSync(req.body.password, result.password) == true) {
+      res.send(`Successfully login for ${result.username}`)
+    } else {
+      res.send(`Incorrect password!`)
+    }
+  } else {
+    res.send(`Unable to find the username ${req.body.username}. Please register for new users.`)
+  }
+
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// // app.post('/user', async (req, res) => {
+
+// //   const hash = bcrypt.hashSync(req.body.author, saltRounds)
+// //   //insertOne the registration data to mongoDB
+// //   let result = await client.db('sample_mflix').collection('subtitle').insertOne(
+// //     {
+// //       language: req.body.language,
+// //       movie: req.body.movie,
+// //       author: hash,
+// //     }
+// //   )
+// //   res.send(result)
+// // })
+
+// app.post('/login', async (req, res) => {
+
+//   //////////////////////////////////////////////////////////////////////////////////////////
+//     // step #1: req.body.username ??
+//     if (req.body.username != null && req.body.password != null) {
+//       let result = await client.db("maybank2u").collection("users").findOne({
+//         username: req.body.username
+//       })
+  
+//       if (result) {
+//         // step #2: if user exist, check if password is correct
+//         if (bcrypt.compareSync(req.body.password, result.password) == true) {
+//           // password is correct
+//           res.send("Welcome back " + result.name)
+//         } else {
+//           // password is incorrect
+//           res.status(401).send('wrong password')
+//         }
+  
+//       } else {
+//         // step #3: if user not found
+//         res.status(401).send("username is not found")
+//       }
+//     } else {
+//       res.status(400).send("missing username or password")
+//     }
+// //////////////////////////////////////////////////////////////////////
+//   if (req.body.movie != null && req.body.language != null) {
+//     let result = await client.db('sample_mflix').collection('subtitle').findOne(
+//       {
+//         //movie: req.body.movie
+//       }
+//     )
+//   }
+//   //step #1: req.body.username
+//   let result = await client.db('sample_mflix').collection('subtitle').findOne(
+//     {
+//       language: req.body.language
+//     }
+//   )
+
+//   if (result) {
+//     //step #2: if user exist
+//     console.log('found:' + result.language)
+//     //res.send('found')
+
+//     if (bcrypt.compareSync(req.body.author, result.author) == true) {
+//       console.log('successfully login')
+//       res.send('successfully login')
+//     }
+//   } else {
+//     //step #3: if user not found
+//     console.log('not found: ' + req.body.language)
+//     res.send('not found')
+//   }
+
+// })
 
 app.get('/', (req, res) => {
   res.send('Khai was here')
