@@ -1,0 +1,90 @@
+Q1
+
+let ans1 = await client.db('Tuto1').collection('employees').find().toArray()
+console.log(ans1)
+
+let ans2 = await client.db('Tuto1').collection('employees').find(
+    {
+        department: `IT`
+    }
+).toArray()
+console.log(ans2)
+
+let ans3 = await client.db('Tuto1').collection('employees').find(
+    {
+        age: {$gt: 30}
+    }
+).toArray()
+console.log(ans3)
+
+let ans4 = await client.db('Tuto1').collection('employees').find(
+    {
+        salary: {$gt: 6000}
+    }
+).toArray()
+console.log(ans4)
+
+Q2
+
+let ans5 = await client.db('Tuto1').collection('books').find().toArray()
+console.log(ans5)
+
+let ans6 = await client.db('Tuto1').collection('books').find(
+    {
+        author: `George Orwell`
+    }
+).toArray()
+console.log(ans6)
+
+let ans7 = await client.db('Tuto1').collection('books').find(
+    {
+        year: {$gt: 1950}
+    }
+).toArray()
+console.log(ans7)
+
+let ans8 = await client.db('Tuto1').collection('books').find(
+    {
+        genre: `Fiction`
+    }
+).toArray()
+console.log(ans8)
+
+Q3
+
+let ans9 = await client.db('Tuto1').collection('products').find(
+    {
+        category: `Laptops`
+    }
+).toArray()
+console.log(ans9)
+
+let ans10 = await client.db('Tuto1').collection('products').find(
+    {
+        $and:[
+            {category: `Laptops`},
+            {price: {$gt: 1000}}
+        ]
+    }
+).toArray()
+console.log(ans10)
+
+let ans11 = await client.db('Tuto1').collection('products').find(
+    {
+        $or:[
+            {in_stock: true},
+            {price: {$lt: 1000}}
+        ]
+    }
+).toArray()
+console.log(ans11)
+
+let ans12 = await client.db('Tuto1').collection('products').find(
+    {
+        $and:[
+            {category: {$ne: `Smartphones`}},
+            {brand: {$ne: `Samsung`}}
+        ]
+    }
+).toArray()
+console.log(ans12)

@@ -120,6 +120,41 @@ DELETE  D   deleteOne
 
 Deadline: W13
 
+    // let result = await client.db('sample_mflix').collection('subtitle').insertOne(
+    //   {
+    //     language: 'Japanese',
+    //     movie: 'Tokyo Drift',
+    //     author: 'Kohei'
+    //   }
+    // )
+    // console.log(result)
+
+    // let subtitle = await client.db('sample_mflix').collection('subtitle').find().toArray()
+    // console.log(subtitle)
+
+    // let subtitle = await client.db('sample_mflix').collection('subtitle').find(
+    //   {
+    //     language: 'Malay'
+    //   }
+    // ).toArray()
+    // console.log(subtitle)
+
+    // let updated = await client.db('sample_mflix').collection('subtitle').updateOne(
+    //   { movie: 'Your Name' },
+    //   { $set:{
+    //     author: 'Abu'
+    //     }
+    //   }
+    // )
+    // console.log(updated)
+
+    // let deleted = await client.db('sample_mflix').collection('subtitle').deleteOne(
+    //   {
+    //     _id: new ObjectId('660b6d82639a5d19b19fde83')
+    //   }
+    // )
+    // console.log(deleted)
+
 ---------------------------16/4/2024------------------------------------------
 
 127.0.0.1 is the server for self computer
@@ -148,3 +183,113 @@ app.post('/user', async (req, res) => {
 
 encryption and decryption -> can go back and forth
 hashing -> can only go one way
+
+--------------------------------------------------------
+
+app.post('/register', async (req, res) => {
+
+  if (req.body.username != null && req.body.password != null) {
+    
+    let findSimilar = await client.db("instagram").collection("account").findOne(
+      {
+        username: req.body.username
+      }
+    )
+
+    if (!findSimilar) {
+
+      const hash = bcrypt.hashSync(req.body.password, saltRounds)
+
+      let result = await client.db("instagram").collection("account").insertOne(
+        {
+          username: req.body.username,
+          password: hash
+        }
+      )
+
+      if (result) {
+        res.send(`Successfully registered!`)
+        console.log(`Inserted into DB\nusername: ${req.body.username}\npassword: ${req.body.password}`)
+      } else {
+        res. send(`Something went wrong! Please try again.`)
+      }
+
+    } else {
+      res.send(`The username ${req.body.username} is already taken.`)    
+    }
+
+  } else {
+    res.send(`Please enter a username and password.`)
+  }
+
+})
+
+app.get(`/login`, async (req, res) => {
+
+  let result = await client.db("instagram").collection("account").findOne(
+    {
+      username: req.body.username
+    }
+  )
+
+  if (result) {
+    if(bcrypt.compareSync(req.body.password, result.password) == true) {
+      res.send(`Successfully login for ${result.username}`)
+    } else {
+      res.send(`Incorrect password!`)
+    }
+  } else {
+    res.send(`Unable to find the username ${req.body.username}. Please register for new users.`)
+  }
+
+})
+
+-------------------------------------------------------------------------------
+
+filter              Operation
+$eq: ==             find({<key>:{$eq:"......"}})      => default
+$ne: !=
+$gt: >
+$gt: >
+$lte: <=
+$gte: >=
+$and: &&
+$or: ||
+$elemMatch: <= to match inside the array of a collection
+
+example
+1.
+-{price: {$gt: 3}, price: {$lt: 10}}  <= will not work as expected (want to get more than 5 but less than 10)
+-{$and:[ {price: {$gt: 3}}, {price: {$lt: 10}} ]}
+
+2.
+-{ ingredients: { $elemMatch: {type: {$eq: "Gula"}}}}
+
+3.
+-{ ingredients: { $elemMatch: {type: {$eq: "Gula"}, amount: {$gt: 100}}}}   <=to get multiple condition in array
+
+------------------------------------------
+
+Midterm
+Q1
+filter 1/2
+operation 1/2
+
+Q2
+Node.js
+
+---------------------------------------------
+
+updateOne(<filter>, <operator>)
+          {_id:...} {name:....}
+
+{$inc: {price: 5}}                <=increases a value by the specified value; can also use negative number to decrease value
+{$set: {price: 5}}                <=sets the value to the specified value
+{$min: {price: 10}}               <=sets the value to the specified value if the value in the collection is less than the specified value
+{$max: {price: 20}}               <=sets the value to the specified value if the value in the collection is more than the specified value
+
+Below are used only on the parameter with array/ object that are an array
+{$pop: {ingredients: -1}}         <=removes the first(-1) or last(1) object in the specified array of the collection
+{$pull: {ingredients: {type: "rice"}}}    <=removes all the object that matches the specified parameter in the specified array
+{$push: {ingredients: {type: "kacang", amount: 20}}}    <=adds object to the specified array
+{$addToSet: {ingredients: {type: "kacang", amount: 20}}}    <=adds object to the specified array if the value does not exist yet
