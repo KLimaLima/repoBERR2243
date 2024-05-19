@@ -293,3 +293,221 @@ Below are used only on the parameter with array/ object that are an array
 {$pull: {ingredients: {type: "rice"}}}    <=removes all the object that matches the specified parameter in the specified array
 {$push: {ingredients: {type: "kacang", amount: 20}}}    <=adds object to the specified array
 {$addToSet: {ingredients: {type: "kacang", amount: 20}}}    <=adds object to the specified array if the value does not exist yet
+
+
+------------------------------7/5/2024-------------------
+
+authentication
+authorization
+
+JWT - JSON Web Token
+
+use token
+
+jwt.sign({ foo: 'bar' }, 'shhh')
+1. Payload { foo: 'bar' }
+2. Passkey 'shhh'
+
+can also do this => prefer to take ones that are wholly unique and DON'T PUT IN PASSWORD (put password in shhh part)
+jwt.sign({ _id: 'bar', name: 'ali' }, 'shhh')
+
+req.headers.authorization => to get the authorization from the postman
+use bearer token to insert the token you want to put in authorization
+
+token => payload (to decrypt)
+
+to decrypt use => req.headers.authorization.split(' ') => will divide to two string at the space
+let token = req.headers.authorization.split(' ')[1]  <= most simplified technique; gives only the token
+
+let decoded = jwt.verify(token, 'password') <= pass in the token and the passowrd that is used to encrypt it
+
+app.post('/login', verifyToken, async (req, res) => {})    //verifyToken is a function
+
+function verifyToken(req, res, next) {
+
+  const authHeader = req.headers.authorization
+  const token = authHeader && authHeader.split(` `)[1]
+
+  if (token == null) return res.sendStatus(401)
+
+    jwt.verify(token, "secret-password", (err, decoded) => {
+      console.log(err)
+
+      if (err) return res.sendStatus(403)
+
+        req.identity = decoded
+
+        next()
+    })
+
+}
+
+// user login api 
+app.post('/login', async (req, res) => {
+  // step #1: req.body.username ??
+  if (req.body.username != null && req.body.password != null) {
+    let result = await client.db("maybank2u").collection("users").findOne({
+      username: req.body.username
+    })
+
+    if (result) {
+      // step #2: if user exist, check if password is correct
+      if (bcrypt.compareSync(req.body.password, result.password) == true) {
+        // password is correct
+        var token = jwt.sign(
+          { _id: result._id, username: result.username, name: result.name },
+          'passwordorangsusahnakhack'
+        );
+        res.send(token)
+      } else {
+        // password is incorrect
+        res.status(401).send('wrong password')
+      }
+
+    } else {
+      // step #3: if user not found
+      res.status(401).send("username is not found")
+    }
+  } else {
+    res.status(400).send("missing username or password")
+  }
+})
+
+// new user registration
+app.post('/user', async (req, res) => {
+  // check if username already exist ??
+
+  // insertOne the registration data to mongo
+  const hash = bcrypt.hashSync(req.body.password, 10);
+
+  let result = await client.db("maybank2u").collection("users").insertOne(
+    {
+      username: req.body.username,
+      password: hash,
+      name: req.body.name,
+      email: req.body.email
+    }
+  )
+  res.send(result)
+
+})
+
+// get user profile
+app.get('/user/:id', verifyToken, async (req, res) => {
+  if (req.identify._id != req.params.id) {
+    res.status(401).send('Unauthorized Access')
+  } else {
+    let result = await client.db("maybank2u").collection("users").findOne({
+      _id: new ObjectId(req.params.id)
+    })
+    res.send(result)
+  }
+})
+
+// update user account
+app.patch('/user/:id', verifyToken, async (req, res) => {
+  if (req.identify._id != req.params.id) {
+    res.send('Unauthorized')
+  } else {
+    let result = await client.db("maybank2u").collection("users").updateOne(
+      {
+        _id: new ObjectId(req.params.id)
+      },
+      {
+        $set: {
+          name: req.body.name
+        }
+      }
+    )
+    res.send(result)
+  }
+})
+
+// delete user account
+app.delete('/user/:id', verifyToken, async (req, res) => {
+  let result = await client.db("maybank2u").collection("users").deleteOne(
+    {
+      _id: new ObjectId(req.params.id)
+    }
+  )
+  res.send(result)
+})
+
+app.post('/buy', async (req, res) => {
+  const token = req.headers.authorization.split(" ")[1]
+
+  var decoded = jwt.verify(token, 'mysupersecretpasskey');
+  console.log(decoded)
+})
+
+--------------------------------------14/5/2024------------------------------------------------------
+
+Mongo Aggregation Framework (MAF)
+
+$match
+$project => can also do calculation with this
+$unwind
+$sort
+$limit
+$lookup
+
+example:
+1.
+[
+  {
+    '$project': {
+      'ingredients': 1, 
+      'category': 1, 
+      'name': 1
+    }
+  }, {
+    '$sort': {
+      'sort': -1
+    }
+  }, {
+    '$limit': 4
+  }
+]
+
+2.
+[
+  {
+    '$match': {
+      'category': 'food'
+    }
+  }
+]
+
+3.
+[
+  {
+    '$unwind': {
+      'path': '$ingredients'
+    }
+  }
+]
+
+4.
+[
+  {
+    '$project': {
+      'ingredientsAmount': '$ingredients.amount'
+    }
+  }
+]
+
+5.
+[
+  {
+    '$match': {
+      'username': 'User1'
+    }
+  }, {
+    '$lookup': {
+      'from': 'food', 
+      'localField': 'items', 
+      'foreignField': '_id', 
+      'as': 'items'
+    }
+  }
+]
