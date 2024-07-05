@@ -285,15 +285,14 @@ updateOne(<filter>, <operator>)
 
 {$inc: {price: 5}}                <=increases a value by the specified value; can also use negative number to decrease value
 {$set: {price: 5}}                <=sets the value to the specified value
-{$min: {price: 10}}               <=sets the value to the specified value if the value in the collection is less than the specified value
-{$max: {price: 20}}               <=sets the value to the specified value if the value in the collection is more than the specified value
+{$min: {price: 10}}               <=sets the value to the specified value if the value in the collection is more than the specified value
+{$max: {price: 20}}               <=sets the value to the specified value if the value in the collection is less than the specified value
 
 Below are used only on the parameter with array/ object that are an array
 {$pop: {ingredients: -1}}         <=removes the first(-1) or last(1) object in the specified array of the collection
 {$pull: {ingredients: {type: "rice"}}}    <=removes all the object that matches the specified parameter in the specified array
 {$push: {ingredients: {type: "kacang", amount: 20}}}    <=adds object to the specified array
 {$addToSet: {ingredients: {type: "kacang", amount: 20}}}    <=adds object to the specified array if the value does not exist yet
-
 
 ------------------------------7/5/2024-------------------
 
@@ -511,3 +510,343 @@ example:
     }
   }
 ]
+
+-------------------------------------------------------------
+
+[
+  {
+    '$match': {
+      'name': 'Leslie Martinez'
+    }
+  }, {
+    '$project': {
+      'name': 1, 
+      'email': 1, 
+      'accounts': 1
+    }
+  }
+]
+
+[
+  {
+    '$match': {
+      'name': 'Leslie Martinez'
+    }
+  }, {
+    '$lookup': {
+      'from': 'accounts', 
+      'localField': 'accounts', 
+      'foreignField': 'account_id', 
+      'as': 'accounts'
+    }
+  }
+]
+
+------------------------------------------------------------------------------------
+
+tuto 4
+
+Q1
+
+1. updateOne(<filter>, <data>)
+                |           |
+              $eq, $ne,    $set,
+              $lt, $gt     $inc, $pop
+
+updateOne(
+  {name: {$eq: "John Doe"}},
+  {$set: {department: "Customer Support"}}
+)
+
+2.
+
+updateOne(
+  {name: {$eq: "Alice Johnson"}},
+  {$inc: {project: 1}}
+)
+
+3.
+
+find(
+  $or[
+  {department: {$eq: "Sales"}},
+  {project: {$gt: 4}}
+  ]
+)
+
+4.
+
+find(
+  {$or: [
+    {skills: {$eq: "communication"}},
+    {skills: {$eq: "negotiation"}}
+  ]}
+)
+
+find(
+  {skills: {$in: ["communication", "negotiation"]}}
+)
+
+5.
+
+find(
+  $and[
+    {age: {$lt: 30}},
+    {department: {$eq: "Development"}}
+  ]
+)
+
+6.
+
+updateOne(
+  {name: {$eq: "Jane Smith"}},
+  {$addToSet: {skills: "management"}}
+)
+
+updateOne(
+  {name: {$eq: "Jane Smith"}},
+  {$push: {skills: "management"}}
+)
+
+7.
+
+find(
+  $or[
+    {name: {$eq: "John Doe"}},
+    {skills: {$eq: "seo"}}
+  ]
+)
+
+8.
+
+updateMany(
+  {active: {$eq: false}},
+  {$inc: {projects: -1}}
+)
+
+9.
+
+find(
+  $and[
+    {active: {$eq: true}},
+    {skills: {$eq: "programming"}}
+  ]
+)
+
+10.
+
+updateMany(
+  {department: {$eq: "marketing"}},
+  {$inc: {age: 2}}
+)
+
+marks given on updateMany, department, $eq, "marketing", $inc, age, 2
+
+Q2
+
+updateMany(
+  {},
+  {$inc: {stock: -2}}
+)
+
+---------------------------------------------------------------------
+
+app.get       READ
+app.post      CREATE
+app.patch     UPDATE
+app.delete    DELETE
+=> These are HTTP Method
+
+endpoint => '/'
+
+(req, res)  => request and response
+
+req.body => to get data
+res.send => send data back to client
+
+Q1 MQL
+
+====================================================================
+
+genre.name : {$eq: "Drama"}
+
+genre: {$elemMatch: {name: "Drama"}}
+
+========================================================================
+
+find(
+  $and[
+    { format: {$eq: "hardcover"}},
+    { publisher: {$eq: "Penguin Random House"}}
+  ]
+)
+
+==========================================================================
+
+find(
+  {$and: [
+    {$or: [
+      {tag: {$eq: "classic"}},
+      {tag: {$eq: "bestseller"}}
+    ]},
+    {author: {$eq: "Jane Austen"}}
+  ]}
+)
+
+find(
+  {$and: [
+  {tag: {$in: ["classic", "bestseller"]}},
+  {author: {$eq: "Jane Austen"}}
+  ]}
+)
+
+=========================================================================
+
+find(
+  {$and[
+  {year: {$gte: 2000}},
+  {year: {$lte: 2010}},
+  {publisher: {$eq: "HarperCollins"}}
+  ]}
+)
+
+========================================================================
+
+find(
+  {courses: {$elemMatch: {course_name: "Physics"}}}
+)
+
+find(
+  {courses.course_name: {$eq: "Physics"}}
+)
+
+==========================================================================
+
+find(
+  {courses.grade: {$eq: "A"}}
+)
+
+=======================================================================
+
+findOne(
+  {name: "Charlie"}
+)
+
+==========================================================================
+
+updateOne(
+  {name: "Bob", courses.course_name: "Mathematics"},
+  {$set: {courses.$.grade: "B"}}
+)
+
+updateOne(
+  {name: {$eq: Bob}}, {courses.course_name: {$eq: "Mathematics"}},
+  {$set: {courses.course_name : "B"}}
+)
+
+========================================================================
+
+updateOne(
+  {name: "Alice"},
+  {$pull: {courses: {course_name: "Chemistry"}}}
+)
+
+======================================================================================
+
+MQL               Aggregation Framework
+
+find()            $match
+insertOne()       $project
+updateOne()       $unwind
+deleteOne()       $limit
+                  $sort
+                  $lookup
+
+=======================================================================================
+
+orders                        customers
+
+Stage #1: $lookup     =>    join
+
+Stage #2: $unwind     =>    flatten, array
+
+Stage #3: $project    =>    
+
+=======================================================================================
+
+1.
+$lookup
+
+{
+  order_id: 1,
+  customer_id: 1,
+  products: [],
+  order_date:,
+  customer_info: [
+    {customer_id:,
+    name:,
+    email:}
+  ]
+}
+
+2.
+$unwind
+
+{
+  order_id:,
+  customer_id:,
+  products:[],
+  order_date:,
+  customer_info: {
+    customer_id:,
+    name:,
+    email:
+  }
+}
+
+3.
+$project
+
+{
+  order_id:,
+  customer_name:,
+  customer_email:,
+  total_request:1220
+}
+
+===========================================
+
+courses.aggregate([
+  {
+    $match: {
+      session: {$eq: "2021-2"}
+    }
+  },
+
+  {
+    $project: {
+      total_students: { $count: "$students" }
+    }
+  }
+])
+
+==========================================================
+
+courses.aggregate([
+  {
+    $match: {
+      _id: "BENR2423"
+    }
+  },
+  {
+    $lookup: {
+      from:"lecturer",
+      localField:"lecturer",
+      foreignField:"_id",
+      as: "lecturer"
+    }
+  }
+])
+
+============================================================
+
